@@ -1,0 +1,29 @@
+[project]
+name = "ct_img"
+version = "0.1.0"
+description = "Segmentation of cartilage in CT images."
+authors = [
+    {name = "Halvor Kvamme", email = "flkz@proton.me"},
+]
+dependencies = [
+    "jupyter>=1.0.0",
+    "scikit-image>=0.22.0",
+    "scipy>=1.9.3",
+    "pillow>=10.0.1",
+    "numpy>=1.25.2",
+    "pydicom>=2.4.3",
+    "matplotlib>=3.8.0",
+]
+requires-python = ">=3.11"
+readme = "README.md"
+license = {text = "MIT"}
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "types-Pillow>=10.1.0.0",
+    "ruff>=0.1.2",
+    "python-lsp-server>=1.8.2",
+    "python-lsp-ruff>=1.6.0",
+    "mypy>=1.6.1",
+    "pylsp-mypy>=0.6.7",
+]
