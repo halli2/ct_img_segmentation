@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 from pydicom.dataset import FileDataset
 import pydicom
 import numpy as np
@@ -34,20 +35,11 @@ def normalize_image(
         )
 
 
-def load_subject(subj_path: Path) -> list[FileDataset]:
-    slices: list[FileDataset] = []
-    # Load all files, sorted
-    file_paths = sorted(subj_path.glob("*dcm"))
-    for file_name in file_paths:
-        dcm_file = pydicom.dcmread(file_name)
-        if hasattr(dcm_file, "SliceLocation"):
-            slices.append(dcm_file)
-        else:
-            print(f"Skipped file {file_name}: No sliceLocation")
-    return slices
-
-
-def convert(subject: str) -> None:
+def convert(
+    subject: str,
+    # Window center, width
+    custom_window: Optional[tuple[int, int]] = None,
+) -> None:
     """Converts .dcm images to uint8 png images."""
     subject_path = Path(f"image_data/{subject}")
     saved_folder = Path(f"processed_images/{subject}")
@@ -57,10 +49,16 @@ def convert(subject: str) -> None:
     normalize_func = np.vectorize(normalize_image)
     for i, file_name in enumerate(file_paths):
         with pydicom.dcmread(file_name) as ds:
-            if not hasattr(ds, "SliceLocation"):
-                print(f"Skipped file {file_name}: No sliceLocation")
-                continue
-            center, width = int(ds.WindowCenter[0]), int(ds.WindowWidth[0])
+            # if not hasattr(ds, "SliceLocation"):
+            #     print(f"Skipped file {file_name}: No sliceLocation")
+            #     continue
+            if custom_window is not None:
+                center = custom_window[0]
+                width = custom_window[1]
+            elif type(ds.WindowCenter) is list:
+                center, width = int(ds.WindowCenter[0]), int(ds.WindowWidth[0])
+            else:
+                center, width = int(ds.WindowCenter), int(ds.WindowWidth)
             rescale_slope = int(ds.RescaleSlope)
             rescale_intercept = int(ds.RescaleIntercept)
 
